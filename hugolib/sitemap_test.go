@@ -1,14 +1,14 @@
 package hugolib
 
 import (
-	"bytes"
-	"testing"
+    "bytes"
+    "testing"
 
-	"github.com/spf13/afero"
-	"github.com/spf13/hugo/helpers"
-	"github.com/spf13/hugo/hugofs"
-	"github.com/spf13/hugo/source"
-	"github.com/spf13/viper"
+    "github.com/iswarezwp/hugo/helpers"
+    "github.com/iswarezwp/hugo/hugofs"
+    "github.com/iswarezwp/hugo/source"
+    "github.com/spf13/afero"
+    "github.com/spf13/viper"
 )
 
 const SITEMAP_TEMPLATE = `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -23,46 +23,46 @@ const SITEMAP_TEMPLATE = `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap
 </urlset>`
 
 func TestSitemapOutput(t *testing.T) {
-	viper.Reset()
-	defer viper.Reset()
+    viper.Reset()
+    defer viper.Reset()
 
-	hugofs.DestinationFS = new(afero.MemMapFs)
+    hugofs.DestinationFS = new(afero.MemMapFs)
 
-	viper.Set("baseurl", "http://auth/bub/")
+    viper.Set("baseurl", "http://auth/bub/")
 
-	s := &Site{
-		Source: &source.InMemorySource{ByteSource: WEIGHTED_SOURCES},
-	}
+    s := &Site{
+        Source: &source.InMemorySource{ByteSource: WEIGHTED_SOURCES},
+    }
 
-	s.initializeSiteInfo()
+    s.initializeSiteInfo()
 
-	s.prepTemplates()
-	s.addTemplate("sitemap.xml", SITEMAP_TEMPLATE)
+    s.prepTemplates()
+    s.addTemplate("sitemap.xml", SITEMAP_TEMPLATE)
 
-	if err := s.CreatePages(); err != nil {
-		t.Fatalf("Unable to create pages: %s", err)
-	}
+    if err := s.CreatePages(); err != nil {
+        t.Fatalf("Unable to create pages: %s", err)
+    }
 
-	if err := s.BuildSiteMeta(); err != nil {
-		t.Fatalf("Unable to build site metadata: %s", err)
-	}
+    if err := s.BuildSiteMeta(); err != nil {
+        t.Fatalf("Unable to build site metadata: %s", err)
+    }
 
-	if err := s.RenderHomePage(); err != nil {
-		t.Fatalf("Unable to RenderHomePage: %s", err)
-	}
+    if err := s.RenderHomePage(); err != nil {
+        t.Fatalf("Unable to RenderHomePage: %s", err)
+    }
 
-	if err := s.RenderSitemap(); err != nil {
-		t.Fatalf("Unable to RenderSitemap: %s", err)
-	}
+    if err := s.RenderSitemap(); err != nil {
+        t.Fatalf("Unable to RenderSitemap: %s", err)
+    }
 
-	sitemapFile, err := hugofs.DestinationFS.Open("sitemap.xml")
+    sitemapFile, err := hugofs.DestinationFS.Open("sitemap.xml")
 
-	if err != nil {
-		t.Fatalf("Unable to locate: sitemap.xml")
-	}
+    if err != nil {
+        t.Fatalf("Unable to locate: sitemap.xml")
+    }
 
-	sitemap := helpers.ReaderToBytes(sitemapFile)
-	if !bytes.HasPrefix(sitemap, []byte("<?xml")) {
-		t.Errorf("Sitemap file should start with <?xml. %s", sitemap)
-	}
+    sitemap := helpers.ReaderToBytes(sitemapFile)
+    if !bytes.HasPrefix(sitemap, []byte("<?xml")) {
+        t.Errorf("Sitemap file should start with <?xml. %s", sitemap)
+    }
 }

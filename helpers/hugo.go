@@ -14,12 +14,12 @@
 package helpers
 
 import (
-	"fmt"
-	"io/ioutil"
-	"path/filepath"
+    "fmt"
+    "io/ioutil"
+    "path/filepath"
 
-	"github.com/spf13/hugo/hugofs"
-	"github.com/spf13/hugo/parser"
+    "github.com/iswarezwp/hugo/hugofs"
+    "github.com/iswarezwp/hugo/parser"
 )
 
 // this should be the only one
@@ -29,81 +29,81 @@ const hugoVersionSuffix = "-DEV" // blank this when doing a release
 // HugoVersion returns the current Hugo version. It will include
 // a suffix, typically '-DEV', if it's development version.
 func HugoVersion() string {
-	return hugoVersion(hugoVersionMain, hugoVersionSuffix)
+    return hugoVersion(hugoVersionMain, hugoVersionSuffix)
 }
 
 // HugoReleaseVersion is same as HugoVersion, but no suffix.
 func HugoReleaseVersion() string {
-	return hugoVersionNoSuffix(hugoVersionMain)
+    return hugoVersionNoSuffix(hugoVersionMain)
 }
 
 // NextHugoReleaseVersion returns the next Hugo release version.
 func NextHugoReleaseVersion() string {
-	return hugoVersionNoSuffix(hugoVersionMain + 0.01)
+    return hugoVersionNoSuffix(hugoVersionMain + 0.01)
 }
 
 func hugoVersion(version float32, suffix string) string {
-	return fmt.Sprintf("%.2g%s", version, suffix)
+    return fmt.Sprintf("%.2g%s", version, suffix)
 }
 
 func hugoVersionNoSuffix(version float32) string {
-	return fmt.Sprintf("%.2g", version)
+    return fmt.Sprintf("%.2g", version)
 }
 
 // IsThemeVsHugoVersionMismatch returns whether the current Hugo version is < theme's min_version
 func IsThemeVsHugoVersionMismatch() (mismatch bool, requiredMinVersion string) {
-	if !ThemeSet() {
-		return
-	}
+    if !ThemeSet() {
+        return
+    }
 
-	themeDir, err := getThemeDirPath("")
+    themeDir, err := getThemeDirPath("")
 
-	if err != nil {
-		return
-	}
+    if err != nil {
+        return
+    }
 
-	fs := hugofs.SourceFs
-	path := filepath.Join(themeDir, "theme.toml")
+    fs := hugofs.SourceFs
+    path := filepath.Join(themeDir, "theme.toml")
 
-	exists, err := Exists(path, fs)
+    exists, err := Exists(path, fs)
 
-	if err != nil || !exists {
-		return
-	}
+    if err != nil || !exists {
+        return
+    }
 
-	f, err := fs.Open(path)
+    f, err := fs.Open(path)
 
-	if err != nil {
-		return
-	}
+    if err != nil {
+        return
+    }
 
-	defer f.Close()
+    defer f.Close()
 
-	b, err := ioutil.ReadAll(f)
+    b, err := ioutil.ReadAll(f)
 
-	if err != nil {
-		return
-	}
+    if err != nil {
+        return
+    }
 
-	c, err := parser.HandleTOMLMetaData(b)
+    c, err := parser.HandleTOMLMetaData(b)
 
-	if err != nil {
-		return
-	}
+    if err != nil {
+        return
+    }
 
-	config := c.(map[string]interface{})
+    config := c.(map[string]interface{})
 
-	if minVersion, ok := config["min_version"]; ok {
-		switch minVersion.(type) {
-		case float32:
-			return hugoVersionMain < minVersion.(float32), fmt.Sprint(minVersion)
-		case float64:
-			return hugoVersionMain < minVersion.(float64), fmt.Sprint(minVersion)
-		default:
-			return
-		}
+    if minVersion, ok := config["min_version"]; ok {
+        switch minVersion.(type) {
+        case float32:
+            return hugoVersionMain < minVersion.(float32), fmt.Sprint(minVersion)
+        case float64:
+            return hugoVersionMain < minVersion.(float64), fmt.Sprint(minVersion)
+        default:
+            return
+        }
 
-	}
+    }
 
-	return
+    return
 }

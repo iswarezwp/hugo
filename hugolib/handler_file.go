@@ -14,40 +14,40 @@
 package hugolib
 
 import (
-	"github.com/dchest/cssmin"
-	"github.com/spf13/hugo/helpers"
-	"github.com/spf13/hugo/source"
-	"github.com/spf13/hugo/tpl"
+    "github.com/dchest/cssmin"
+    "github.com/iswarezwp/hugo/helpers"
+    "github.com/iswarezwp/hugo/source"
+    "github.com/iswarezwp/hugo/tpl"
 )
 
 func init() {
-	RegisterHandler(new(cssHandler))
-	RegisterHandler(new(defaultHandler))
+    RegisterHandler(new(cssHandler))
+    RegisterHandler(new(defaultHandler))
 }
 
 type basicFileHandler Handle
 
 func (h basicFileHandler) Read(f *source.File, s *Site) HandledResult {
-	return HandledResult{file: f}
+    return HandledResult{file: f}
 }
 
 func (h basicFileHandler) PageConvert(*Page, tpl.Template) HandledResult {
-	return HandledResult{}
+    return HandledResult{}
 }
 
 type defaultHandler struct{ basicFileHandler }
 
 func (h defaultHandler) Extensions() []string { return []string{"*"} }
 func (h defaultHandler) FileConvert(f *source.File, s *Site) HandledResult {
-	s.WriteDestFile(f.Path(), f.Contents)
-	return HandledResult{file: f}
+    s.WriteDestFile(f.Path(), f.Contents)
+    return HandledResult{file: f}
 }
 
 type cssHandler struct{ basicFileHandler }
 
 func (h cssHandler) Extensions() []string { return []string{"css"} }
 func (h cssHandler) FileConvert(f *source.File, s *Site) HandledResult {
-	x := cssmin.Minify(f.Bytes())
-	s.WriteDestFile(f.Path(), helpers.BytesToReader(x))
-	return HandledResult{file: f}
+    x := cssmin.Minify(f.Bytes())
+    s.WriteDestFile(f.Path(), helpers.BytesToReader(x))
+    return HandledResult{file: f}
 }

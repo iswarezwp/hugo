@@ -14,9 +14,9 @@
 package hugolib
 
 import (
-	"sort"
+    "sort"
 
-	"github.com/spf13/hugo/helpers"
+    "github.com/iswarezwp/hugo/helpers"
 )
 
 /*
@@ -39,8 +39,8 @@ type Taxonomy map[string]WeightedPages
  */
 type WeightedPages []WeightedPage
 type WeightedPage struct {
-	Weight int
-	Page   *Page
+    Weight int
+    Page   *Page
 }
 
 /*
@@ -54,76 +54,76 @@ type OrderedTaxonomy []OrderedTaxonomyEntry
  * Eg:  {Name: Technology, WeightedPages: Taxonomyedpages}
  */
 type OrderedTaxonomyEntry struct {
-	Name          string
-	WeightedPages WeightedPages
+    Name          string
+    WeightedPages WeightedPages
 }
 
 // KeyPrep... Taxonomies should be case insensitive. Can make it easily conditional later.
 func kp(in string) string {
-	return helpers.MakePathToLower(in)
+    return helpers.MakePathToLower(in)
 }
 
 func (i Taxonomy) Get(key string) WeightedPages { return i[kp(key)] }
 func (i Taxonomy) Count(key string) int         { return len(i[kp(key)]) }
 func (i Taxonomy) Add(key string, w WeightedPage, pretty bool) {
-	if !pretty {
-		key = kp(key)
-	}
-	i[key] = append(i[key], w)
+    if !pretty {
+        key = kp(key)
+    }
+    i[key] = append(i[key], w)
 }
 
 // Returns an ordered taxonomy with a non defined order
 func (i Taxonomy) TaxonomyArray() OrderedTaxonomy {
-	ies := make([]OrderedTaxonomyEntry, len(i))
-	count := 0
-	for k, v := range i {
-		ies[count] = OrderedTaxonomyEntry{Name: k, WeightedPages: v}
-		count++
-	}
-	return ies
+    ies := make([]OrderedTaxonomyEntry, len(i))
+    count := 0
+    for k, v := range i {
+        ies[count] = OrderedTaxonomyEntry{Name: k, WeightedPages: v}
+        count++
+    }
+    return ies
 }
 
 // Returns an ordered taxonomy sorted by key name
 func (i Taxonomy) Alphabetical() OrderedTaxonomy {
-	name := func(i1, i2 *OrderedTaxonomyEntry) bool {
-		return i1.Name < i2.Name
-	}
+    name := func(i1, i2 *OrderedTaxonomyEntry) bool {
+        return i1.Name < i2.Name
+    }
 
-	ia := i.TaxonomyArray()
-	OIby(name).Sort(ia)
-	return ia
+    ia := i.TaxonomyArray()
+    OIby(name).Sort(ia)
+    return ia
 }
 
 // Returns an ordered taxonomy sorted by # of pages per key
 func (i Taxonomy) ByCount() OrderedTaxonomy {
-	count := func(i1, i2 *OrderedTaxonomyEntry) bool {
-		return len(i1.WeightedPages) > len(i2.WeightedPages)
-	}
+    count := func(i1, i2 *OrderedTaxonomyEntry) bool {
+        return len(i1.WeightedPages) > len(i2.WeightedPages)
+    }
 
-	ia := i.TaxonomyArray()
-	OIby(count).Sort(ia)
-	return ia
+    ia := i.TaxonomyArray()
+    OIby(count).Sort(ia)
+    return ia
 }
 
 // Helper to move the page access up a level
 func (ie OrderedTaxonomyEntry) Pages() Pages {
-	return ie.WeightedPages.Pages()
+    return ie.WeightedPages.Pages()
 }
 
 func (ie OrderedTaxonomyEntry) Count() int {
-	return len(ie.WeightedPages)
+    return len(ie.WeightedPages)
 }
 
 func (ie OrderedTaxonomyEntry) Term() string {
-	return ie.Name
+    return ie.Name
 }
 
 func (t OrderedTaxonomy) Reverse() OrderedTaxonomy {
-	for i, j := 0, len(t)-1; i < j; i, j = i+1, j-1 {
-		t[i], t[j] = t[j], t[i]
-	}
+    for i, j := 0, len(t)-1; i < j; i, j = i+1, j-1 {
+        t[i], t[j] = t[j], t[i]
+    }
 
-	return t
+    return t
 }
 
 /*
@@ -132,66 +132,66 @@ func (t OrderedTaxonomy) Reverse() OrderedTaxonomy {
 
 // A type to implement the sort interface for TaxonomyEntries.
 type orderedTaxonomySorter struct {
-	taxonomy OrderedTaxonomy
-	by       OIby
+    taxonomy OrderedTaxonomy
+    by       OIby
 }
 
 // Closure used in the Sort.Less method.
 type OIby func(i1, i2 *OrderedTaxonomyEntry) bool
 
 func (by OIby) Sort(taxonomy OrderedTaxonomy) {
-	ps := &orderedTaxonomySorter{
-		taxonomy: taxonomy,
-		by:       by, // The Sort method's receiver is the function (closure) that defines the sort order.
-	}
-	sort.Stable(ps)
+    ps := &orderedTaxonomySorter{
+        taxonomy: taxonomy,
+        by:       by, // The Sort method's receiver is the function (closure) that defines the sort order.
+    }
+    sort.Stable(ps)
 }
 
 // Len is part of sort.Interface.
 func (s *orderedTaxonomySorter) Len() int {
-	return len(s.taxonomy)
+    return len(s.taxonomy)
 }
 
 // Swap is part of sort.Interface.
 func (s *orderedTaxonomySorter) Swap(i, j int) {
-	s.taxonomy[i], s.taxonomy[j] = s.taxonomy[j], s.taxonomy[i]
+    s.taxonomy[i], s.taxonomy[j] = s.taxonomy[j], s.taxonomy[i]
 }
 
 // Less is part of sort.Interface. It is implemented by calling the "by" closure in the sorter.
 func (s *orderedTaxonomySorter) Less(i, j int) bool {
-	return s.by(&s.taxonomy[i], &s.taxonomy[j])
+    return s.by(&s.taxonomy[i], &s.taxonomy[j])
 }
 
 func (wp WeightedPages) Pages() Pages {
-	pages := make(Pages, len(wp))
-	for i := range wp {
-		pages[i] = wp[i].Page
-	}
-	return pages
+    pages := make(Pages, len(wp))
+    for i := range wp {
+        pages[i] = wp[i].Page
+    }
+    return pages
 }
 
 func (wp WeightedPages) Prev(cur *Page) *Page {
-	for x, c := range wp {
-		if c.Page.UniqueID() == cur.UniqueID() {
-			if x == 0 {
-				return wp[len(wp)-1].Page
-			}
-			return wp[x-1].Page
-		}
-	}
-	return nil
+    for x, c := range wp {
+        if c.Page.UniqueID() == cur.UniqueID() {
+            if x == 0 {
+                return wp[len(wp)-1].Page
+            }
+            return wp[x-1].Page
+        }
+    }
+    return nil
 }
 
 func (wp WeightedPages) Next(cur *Page) *Page {
-	for x, c := range wp {
-		if c.Page.UniqueID() == cur.UniqueID() {
-			if x < len(wp)-1 {
-				return wp[x+1].Page
-			}
-			return wp[0].Page
-		}
-	}
-	return nil
+    for x, c := range wp {
+        if c.Page.UniqueID() == cur.UniqueID() {
+            if x < len(wp)-1 {
+                return wp[x+1].Page
+            }
+            return wp[0].Page
+        }
+    }
+    return nil
 }
 
 func (wp WeightedPages) Len() int      { return len(wp) }
@@ -199,13 +199,13 @@ func (wp WeightedPages) Swap(i, j int) { wp[i], wp[j] = wp[j], wp[i] }
 func (wp WeightedPages) Sort()         { sort.Stable(wp) }
 func (wp WeightedPages) Count() int    { return len(wp) }
 func (wp WeightedPages) Less(i, j int) bool {
-	if wp[i].Weight == wp[j].Weight {
-		if wp[i].Page.Date.Equal(wp[j].Page.Date) {
-			return wp[i].Page.Title < wp[j].Page.Title
-		}
-		return wp[i].Page.Date.After(wp[i].Page.Date)
-	}
-	return wp[i].Weight < wp[j].Weight
+    if wp[i].Weight == wp[j].Weight {
+        if wp[i].Page.Date.Equal(wp[j].Page.Date) {
+            return wp[i].Page.Title < wp[j].Page.Title
+        }
+        return wp[i].Page.Date.After(wp[i].Page.Date)
+    }
+    return wp[i].Weight < wp[j].Weight
 }
 
 // TODO mimic PagesSorter for WeightedPages

@@ -1,57 +1,57 @@
 package target
 
 import (
-	"io"
-	"path/filepath"
+    "io"
+    "path/filepath"
 
-	"github.com/spf13/hugo/helpers"
-	"github.com/spf13/hugo/hugofs"
+    "github.com/iswarezwp/hugo/helpers"
+    "github.com/iswarezwp/hugo/hugofs"
 )
 
 type Publisher interface {
-	Publish(string, io.Reader) error
+    Publish(string, io.Reader) error
 }
 
 type Translator interface {
-	Translate(string) (string, error)
+    Translate(string) (string, error)
 }
 
 // TODO(bep) consider other ways to solve this.
 type OptionalTranslator interface {
-	TranslateRelative(string) (string, error)
+    TranslateRelative(string) (string, error)
 }
 
 type Output interface {
-	Publisher
-	Translator
+    Publisher
+    Translator
 }
 
 type Filesystem struct {
-	PublishDir string
+    PublishDir string
 }
 
 func (fs *Filesystem) Publish(path string, r io.Reader) (err error) {
-	translated, err := fs.Translate(path)
-	if err != nil {
-		return
-	}
+    translated, err := fs.Translate(path)
+    if err != nil {
+        return
+    }
 
-	return helpers.WriteToDisk(translated, r, hugofs.DestinationFS)
+    return helpers.WriteToDisk(translated, r, hugofs.DestinationFS)
 }
 
 func (fs *Filesystem) Translate(src string) (dest string, err error) {
-	return filepath.Join(fs.PublishDir, filepath.FromSlash(src)), nil
+    return filepath.Join(fs.PublishDir, filepath.FromSlash(src)), nil
 }
 
 func (fs *Filesystem) extension(ext string) string {
-	return ext
+    return ext
 }
 
 func filename(f string) string {
-	ext := filepath.Ext(f)
-	if ext == "" {
-		return f
-	}
+    ext := filepath.Ext(f)
+    if ext == "" {
+        return f
+    }
 
-	return f[:len(f)-len(ext)]
+    return f[:len(f)-len(ext)]
 }

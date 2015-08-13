@@ -14,92 +14,92 @@
 package source
 
 import (
-	"github.com/spf13/hugo/helpers"
-	"io"
-	"path/filepath"
-	"strings"
+    "github.com/iswarezwp/hugo/helpers"
+    "io"
+    "path/filepath"
+    "strings"
 )
 
 type File struct {
-	relpath     string // Original Full Path eg. /Users/Home/Hugo/foo.txt
-	logicalName string // foo.txt
-	Contents    io.Reader
-	section     string // The first directory
-	dir         string // The full directory Path (minus file name)
-	ext         string // Just the ext (eg txt)
-	uniqueID    string // MD5 of the filename
+    relpath     string // Original Full Path eg. /Users/Home/Hugo/foo.txt
+    logicalName string // foo.txt
+    Contents    io.Reader
+    section     string // The first directory
+    dir         string // The full directory Path (minus file name)
+    ext         string // Just the ext (eg txt)
+    uniqueID    string // MD5 of the filename
 }
 
 func (f *File) UniqueID() string {
-	return f.uniqueID
+    return f.uniqueID
 }
 
 func (f *File) String() string {
-	return helpers.ReaderToString(f.Contents)
+    return helpers.ReaderToString(f.Contents)
 }
 
 func (f *File) Bytes() []byte {
-	return helpers.ReaderToBytes(f.Contents)
+    return helpers.ReaderToBytes(f.Contents)
 }
 
 // Filename without extension
 func (f *File) BaseFileName() string {
-	return helpers.Filename(f.LogicalName())
+    return helpers.Filename(f.LogicalName())
 }
 
 func (f *File) Section() string {
-	return f.section
+    return f.section
 }
 
 func (f *File) LogicalName() string {
-	return f.logicalName
+    return f.logicalName
 }
 
 func (f *File) SetDir(dir string) {
-	f.dir = dir
+    f.dir = dir
 }
 
 func (f *File) Dir() string {
-	return f.dir
+    return f.dir
 }
 
 func (f *File) Extension() string {
-	return f.ext
+    return f.ext
 }
 
 func (f *File) Ext() string {
-	return f.Extension()
+    return f.Extension()
 }
 
 func (f *File) Path() string {
-	return f.relpath
+    return f.relpath
 }
 
 func NewFileWithContents(relpath string, content io.Reader) *File {
-	file := NewFile(relpath)
-	file.Contents = content
-	return file
+    file := NewFile(relpath)
+    file.Contents = content
+    return file
 }
 
 func NewFile(relpath string) *File {
-	f := &File{
-		relpath: relpath,
-	}
+    f := &File{
+        relpath: relpath,
+    }
 
-	f.dir, _ = filepath.Split(f.relpath)
-	_, f.logicalName = filepath.Split(f.relpath)
-	f.ext = strings.TrimPrefix(filepath.Ext(f.LogicalName()), ".")
-	f.section = helpers.GuessSection(f.Dir())
-	f.uniqueID = helpers.Md5String(f.LogicalName())
+    f.dir, _ = filepath.Split(f.relpath)
+    _, f.logicalName = filepath.Split(f.relpath)
+    f.ext = strings.TrimPrefix(filepath.Ext(f.LogicalName()), ".")
+    f.section = helpers.GuessSection(f.Dir())
+    f.uniqueID = helpers.Md5String(f.LogicalName())
 
-	return f
+    return f
 }
 
 func NewFileFromAbs(base, fullpath string, content io.Reader) (f *File, err error) {
-	var name string
-	if name, err = helpers.GetRelativePath(fullpath, base); err != nil {
-		return nil, err
-	}
+    var name string
+    if name, err = helpers.GetRelativePath(fullpath, base); err != nil {
+        return nil, err
+    }
 
-	return NewFileWithContents(name, content), nil
+    return NewFileWithContents(name, content), nil
 }

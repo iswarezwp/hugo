@@ -22,9 +22,9 @@ import (
     "html/template"
     "os/exec"
 
+    bp "github.com/iswarezwp/hugo/bufferpool"
     "github.com/miekg/mmark"
     "github.com/russross/blackfriday"
-    bp "github.com/spf13/hugo/bufferpool"
     jww "github.com/spf13/jwalterweatherman"
     "github.com/spf13/viper"
 

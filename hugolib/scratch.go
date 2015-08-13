@@ -14,80 +14,80 @@
 package hugolib
 
 import (
-	"github.com/spf13/hugo/helpers"
-	"sort"
+    "github.com/iswarezwp/hugo/helpers"
+    "sort"
 )
 
 // Scratch is a writable context used for stateful operations in Page/Node rendering.
 type Scratch struct {
-	values map[string]interface{}
+    values map[string]interface{}
 }
 
 // Add will add (using the + operator) the addend to the existing addend (if found).
 // Supports numeric values and strings.
 func (c *Scratch) Add(key string, newAddend interface{}) (string, error) {
-	var newVal interface{}
-	existingAddend, found := c.values[key]
-	if found {
-		var err error
-		newVal, err = helpers.DoArithmetic(existingAddend, newAddend, '+')
-		if err != nil {
-			return "", err
-		}
-	} else {
-		newVal = newAddend
-	}
-	c.values[key] = newVal
-	return "", nil // have to return something to make it work with the Go templates
+    var newVal interface{}
+    existingAddend, found := c.values[key]
+    if found {
+        var err error
+        newVal, err = helpers.DoArithmetic(existingAddend, newAddend, '+')
+        if err != nil {
+            return "", err
+        }
+    } else {
+        newVal = newAddend
+    }
+    c.values[key] = newVal
+    return "", nil // have to return something to make it work with the Go templates
 }
 
 // Set stores a value with the given key in the Node context.
 // This value can later be retrieved with Get.
 func (c *Scratch) Set(key string, value interface{}) string {
-	c.values[key] = value
-	return ""
+    c.values[key] = value
+    return ""
 }
 
 // Get returns a value previously set by Add or Set
 func (c *Scratch) Get(key string) interface{} {
-	return c.values[key]
+    return c.values[key]
 }
 
 // SetInMap stores a value to a map with the given key in the Node context.
 // This map can later be retrieved with GetSortedMapValues.
 func (c *Scratch) SetInMap(key string, mapKey string, value interface{}) string {
-	_, found := c.values[key]
-	if !found {
-		c.values[key] = make(map[string]interface{})
-	}
+    _, found := c.values[key]
+    if !found {
+        c.values[key] = make(map[string]interface{})
+    }
 
-	c.values[key].(map[string]interface{})[mapKey] = value
-	return ""
+    c.values[key].(map[string]interface{})[mapKey] = value
+    return ""
 }
 
 // GetSortedMapValues returns a sorted map previously filled with SetInMap
 func (c *Scratch) GetSortedMapValues(key string) interface{} {
-	if c.values[key] == nil {
-		return nil
-	}
+    if c.values[key] == nil {
+        return nil
+    }
 
-	unsortedMap := c.values[key].(map[string]interface{})
+    unsortedMap := c.values[key].(map[string]interface{})
 
-	var keys []string
-	for mapKey, _ := range unsortedMap {
-		keys = append(keys, mapKey)
-	}
+    var keys []string
+    for mapKey, _ := range unsortedMap {
+        keys = append(keys, mapKey)
+    }
 
-	sort.Strings(keys)
+    sort.Strings(keys)
 
-	sortedArray := make([]interface{}, len(unsortedMap))
-	for i, mapKey := range keys {
-		sortedArray[i] = unsortedMap[mapKey]
-	}
+    sortedArray := make([]interface{}, len(unsortedMap))
+    for i, mapKey := range keys {
+        sortedArray[i] = unsortedMap[mapKey]
+    }
 
-	return sortedArray
+    return sortedArray
 }
 
 func newScratch() *Scratch {
-	return &Scratch{values: make(map[string]interface{})}
+    return &Scratch{values: make(map[string]interface{})}
 }

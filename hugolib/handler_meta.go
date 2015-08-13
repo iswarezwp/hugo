@@ -14,106 +14,106 @@
 package hugolib
 
 import (
-	"errors"
+    "errors"
 
-	"fmt"
+    "fmt"
 
-	"github.com/spf13/hugo/source"
+    "github.com/iswarezwp/hugo/source"
 )
 
 var handlers []Handler
 
 type MetaHandler interface {
-	// Read the Files in and register
-	Read(*source.File, *Site, HandleResults)
+    // Read the Files in and register
+    Read(*source.File, *Site, HandleResults)
 
-	// Generic Convert Function with coordination
-	Convert(interface{}, *Site, HandleResults)
+    // Generic Convert Function with coordination
+    Convert(interface{}, *Site, HandleResults)
 
-	Handle() Handler
+    Handle() Handler
 }
 
 type HandleResults chan<- HandledResult
 
 func NewMetaHandler(in string) *MetaHandle {
-	x := &MetaHandle{ext: in}
-	x.Handler()
-	return x
+    x := &MetaHandle{ext: in}
+    x.Handler()
+    return x
 }
 
 type MetaHandle struct {
-	handler Handler
-	ext     string
+    handler Handler
+    ext     string
 }
 
 func (mh *MetaHandle) Read(f *source.File, s *Site, results HandleResults) {
-	if h := mh.Handler(); h != nil {
-		results <- h.Read(f, s)
-		return
-	}
+    if h := mh.Handler(); h != nil {
+        results <- h.Read(f, s)
+        return
+    }
 
-	results <- HandledResult{err: errors.New("No handler found"), file: f}
+    results <- HandledResult{err: errors.New("No handler found"), file: f}
 }
 
 func (mh *MetaHandle) Convert(i interface{}, s *Site, results HandleResults) {
-	h := mh.Handler()
+    h := mh.Handler()
 
-	if f, ok := i.(*source.File); ok {
-		results <- h.FileConvert(f, s)
-		return
-	}
+    if f, ok := i.(*source.File); ok {
+        results <- h.FileConvert(f, s)
+        return
+    }
 
-	if p, ok := i.(*Page); ok {
-		if p == nil {
-			results <- HandledResult{err: errors.New("file resulted in a nil page")}
-			return
-		}
+    if p, ok := i.(*Page); ok {
+        if p == nil {
+            results <- HandledResult{err: errors.New("file resulted in a nil page")}
+            return
+        }
 
-		if h == nil {
-			results <- HandledResult{err: fmt.Errorf("No handler found for page '%s'. Verify the markup is supported by Hugo.", p.FullFilePath())}
-			return
-		}
+        if h == nil {
+            results <- HandledResult{err: fmt.Errorf("No handler found for page '%s'. Verify the markup is supported by Hugo.", p.FullFilePath())}
+            return
+        }
 
-		results <- h.PageConvert(p, s.Tmpl)
-		p.setSummary()
-		p.analyzePage()
-	}
+        results <- h.PageConvert(p, s.Tmpl)
+        p.setSummary()
+        p.analyzePage()
+    }
 }
 
 func (mh *MetaHandle) Handler() Handler {
-	if mh.handler == nil {
-		mh.handler = FindHandler(mh.ext)
+    if mh.handler == nil {
+        mh.handler = FindHandler(mh.ext)
 
-		// if no handler found, use default handler
-		if mh.handler == nil {
-			mh.handler = FindHandler("*")
-		}
-	}
-	return mh.handler
+        // if no handler found, use default handler
+        if mh.handler == nil {
+            mh.handler = FindHandler("*")
+        }
+    }
+    return mh.handler
 }
 
 func FindHandler(ext string) Handler {
-	for _, h := range Handlers() {
-		if HandlerMatch(h, ext) {
-			return h
-		}
-	}
-	return nil
+    for _, h := range Handlers() {
+        if HandlerMatch(h, ext) {
+            return h
+        }
+    }
+    return nil
 }
 
 func HandlerMatch(h Handler, ext string) bool {
-	for _, x := range h.Extensions() {
-		if ext == x {
-			return true
-		}
-	}
-	return false
+    for _, x := range h.Extensions() {
+        if ext == x {
+            return true
+        }
+    }
+    return false
 }
 
 func RegisterHandler(h Handler) {
-	handlers = append(handlers, h)
+    handlers = append(handlers, h)
 }
 
 func Handlers() []Handler {
-	return handlers
+    return handlers
 }

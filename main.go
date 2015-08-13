@@ -14,12 +14,12 @@
 package main
 
 import (
-	"runtime"
+    "runtime"
 
-	"github.com/spf13/hugo/commands"
+    "github.com/iswarezwp/hugo/commands"
 )
 
 func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-	commands.Execute()
+    runtime.GOMAXPROCS(runtime.NumCPU())
+    commands.Execute()
 }

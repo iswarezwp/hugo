@@ -14,48 +14,48 @@
 package hugolib
 
 import (
-	"github.com/spf13/hugo/source"
-	"github.com/spf13/hugo/tpl"
+    "github.com/iswarezwp/hugo/source"
+    "github.com/iswarezwp/hugo/tpl"
 )
 
 type Handler interface {
-	FileConvert(*source.File, *Site) HandledResult
-	PageConvert(*Page, tpl.Template) HandledResult
-	Read(*source.File, *Site) HandledResult
-	Extensions() []string
+    FileConvert(*source.File, *Site) HandledResult
+    PageConvert(*Page, tpl.Template) HandledResult
+    Read(*source.File, *Site) HandledResult
+    Extensions() []string
 }
 
 type Handle struct {
-	extensions []string
+    extensions []string
 }
 
 func (h Handle) Extensions() []string {
-	return h.extensions
+    return h.extensions
 }
 
 type HandledResult struct {
-	page *Page
-	file *source.File
-	err  error
+    page *Page
+    file *source.File
+    err  error
 }
 
 // HandledResult is an error
 func (h HandledResult) Error() string {
-	if h.err != nil {
-		if h.page != nil {
-			return "Error:" + h.err.Error() + " for " + h.page.File.LogicalName()
-		}
-		if h.file != nil {
-			return "Error:" + h.err.Error() + " for " + h.file.LogicalName()
-		}
-	}
-	return h.err.Error()
+    if h.err != nil {
+        if h.page != nil {
+            return "Error:" + h.err.Error() + " for " + h.page.File.LogicalName()
+        }
+        if h.file != nil {
+            return "Error:" + h.err.Error() + " for " + h.file.LogicalName()
+        }
+    }
+    return h.err.Error()
 }
 
 func (h HandledResult) String() string {
-	return h.Error()
+    return h.Error()
 }
 
 func (h HandledResult) Page() *Page {
-	return h.page
+    return h.page
 }

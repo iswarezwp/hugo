@@ -14,18 +14,18 @@
 package commands
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/spf13/hugo/hugolib"
+    "github.com/iswarezwp/hugo/hugolib"
+    "github.com/spf13/cobra"
 )
 
 var check = &cobra.Command{
-	Use:   "check",
-	Short: "Check content in the source directory",
-	Long: `Hugo will perform some basic analysis on the content provided
+    Use:   "check",
+    Short: "Check content in the source directory",
+    Long: `Hugo will perform some basic analysis on the content provided
 and will give feedback.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		InitializeConfig()
-		site := hugolib.Site{}
-		site.Analyze()
-	},
+    Run: func(cmd *cobra.Command, args []string) {
+        InitializeConfig()
+        site := hugolib.Site{}
+        site.Analyze()
+    },
 }

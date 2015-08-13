@@ -14,75 +14,75 @@
 package commands
 
 import (
-	"fmt"
-	"path/filepath"
+    "fmt"
+    "path/filepath"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/hugo/hugolib"
-	"github.com/spf13/viper"
+    "github.com/iswarezwp/hugo/hugolib"
+    "github.com/spf13/cobra"
+    "github.com/spf13/viper"
 )
 
 func init() {
-	listCmd.AddCommand(listDraftsCmd)
-	listCmd.AddCommand(listFutureCmd)
+    listCmd.AddCommand(listDraftsCmd)
+    listCmd.AddCommand(listFutureCmd)
 }
 
 var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "Listing out various types of content",
-	Long:  `Listing out various types of content.
+    Use:   "list",
+    Short: "Listing out various types of content",
+    Long: `Listing out various types of content.
 
 List requires a subcommand, e.g. ` + "`hugo list drafts`.",
-	Run:   nil,
+    Run: nil,
 }
 
 var listDraftsCmd = &cobra.Command{
-	Use:   "drafts",
-	Short: "List all drafts",
-	Long:  `List all of the drafts in your content directory.`,
-	Run: func(cmd *cobra.Command, args []string) {
+    Use:   "drafts",
+    Short: "List all drafts",
+    Long:  `List all of the drafts in your content directory.`,
+    Run: func(cmd *cobra.Command, args []string) {
 
-		InitializeConfig()
-		viper.Set("BuildDrafts", true)
+        InitializeConfig()
+        viper.Set("BuildDrafts", true)
 
-		site := &hugolib.Site{}
+        site := &hugolib.Site{}
 
-		if err := site.Process(); err != nil {
-			fmt.Println("Error Processing Source Content", err)
-		}
+        if err := site.Process(); err != nil {
+            fmt.Println("Error Processing Source Content", err)
+        }
 
-		for _, p := range site.Pages {
-			if p.IsDraft() {
-				fmt.Println(filepath.Join(p.File.Dir(), p.File.LogicalName()))
-			}
+        for _, p := range site.Pages {
+            if p.IsDraft() {
+                fmt.Println(filepath.Join(p.File.Dir(), p.File.LogicalName()))
+            }
 
-		}
+        }
 
-	},
+    },
 }
 
 var listFutureCmd = &cobra.Command{
-	Use:   "future",
-	Short: "List all posts dated in the future",
-	Long:  `List all of the posts in your content directory which will be
+    Use:   "future",
+    Short: "List all posts dated in the future",
+    Long: `List all of the posts in your content directory which will be
 posted in the future.`,
-	Run: func(cmd *cobra.Command, args []string) {
+    Run: func(cmd *cobra.Command, args []string) {
 
-		InitializeConfig()
-		viper.Set("BuildFuture", true)
+        InitializeConfig()
+        viper.Set("BuildFuture", true)
 
-		site := &hugolib.Site{}
+        site := &hugolib.Site{}
 
-		if err := site.Process(); err != nil {
-			fmt.Println("Error Processing Source Content", err)
-		}
+        if err := site.Process(); err != nil {
+            fmt.Println("Error Processing Source Content", err)
+        }
 
-		for _, p := range site.Pages {
-			if p.IsFuture() {
-				fmt.Println(filepath.Join(p.File.Dir(), p.File.LogicalName()))
-			}
+        for _, p := range site.Pages {
+            if p.IsFuture() {
+                fmt.Println(filepath.Join(p.File.Dir(), p.File.LogicalName()))
+            }
 
-		}
+        }
 
-	},
+    },
 }

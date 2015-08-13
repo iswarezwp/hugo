@@ -1,14 +1,14 @@
 package hugolib
 
 import (
-	"bytes"
-	"testing"
+    "bytes"
+    "testing"
 
-	"github.com/spf13/afero"
-	"github.com/spf13/hugo/helpers"
-	"github.com/spf13/hugo/hugofs"
-	"github.com/spf13/hugo/source"
-	"github.com/spf13/viper"
+    "github.com/iswarezwp/hugo/helpers"
+    "github.com/iswarezwp/hugo/hugofs"
+    "github.com/iswarezwp/hugo/source"
+    "github.com/spf13/afero"
+    "github.com/spf13/viper"
 )
 
 const RSS_TEMPLATE = `<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -33,43 +33,43 @@ const RSS_TEMPLATE = `<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom
 </rss>`
 
 func TestRSSOutput(t *testing.T) {
-	viper.Reset()
-	defer viper.Reset()
+    viper.Reset()
+    defer viper.Reset()
 
-	rssUri := "customrss.xml"
-	viper.Set("baseurl", "http://auth/bub/")
-	viper.Set("RSSUri", rssUri)
+    rssUri := "customrss.xml"
+    viper.Set("baseurl", "http://auth/bub/")
+    viper.Set("RSSUri", rssUri)
 
-	hugofs.DestinationFS = new(afero.MemMapFs)
-	s := &Site{
-		Source: &source.InMemorySource{ByteSource: WEIGHTED_SOURCES},
-	}
-	s.initializeSiteInfo()
-	s.prepTemplates()
+    hugofs.DestinationFS = new(afero.MemMapFs)
+    s := &Site{
+        Source: &source.InMemorySource{ByteSource: WEIGHTED_SOURCES},
+    }
+    s.initializeSiteInfo()
+    s.prepTemplates()
 
-	//  Add an rss.xml template to invoke the rss build.
-	s.addTemplate("rss.xml", RSS_TEMPLATE)
+    //  Add an rss.xml template to invoke the rss build.
+    s.addTemplate("rss.xml", RSS_TEMPLATE)
 
-	if err := s.CreatePages(); err != nil {
-		t.Fatalf("Unable to create pages: %s", err)
-	}
+    if err := s.CreatePages(); err != nil {
+        t.Fatalf("Unable to create pages: %s", err)
+    }
 
-	if err := s.BuildSiteMeta(); err != nil {
-		t.Fatalf("Unable to build site metadata: %s", err)
-	}
+    if err := s.BuildSiteMeta(); err != nil {
+        t.Fatalf("Unable to build site metadata: %s", err)
+    }
 
-	if err := s.RenderHomePage(); err != nil {
-		t.Fatalf("Unable to RenderHomePage: %s", err)
-	}
+    if err := s.RenderHomePage(); err != nil {
+        t.Fatalf("Unable to RenderHomePage: %s", err)
+    }
 
-	file, err := hugofs.DestinationFS.Open(rssUri)
+    file, err := hugofs.DestinationFS.Open(rssUri)
 
-	if err != nil {
-		t.Fatalf("Unable to locate: %s", rssUri)
-	}
+    if err != nil {
+        t.Fatalf("Unable to locate: %s", rssUri)
+    }
 
-	rss := helpers.ReaderToBytes(file)
-	if !bytes.HasPrefix(rss, []byte("<?xml")) {
-		t.Errorf("rss feed should start with <?xml. %s", rss)
-	}
+    rss := helpers.ReaderToBytes(file)
+    if !bytes.HasPrefix(rss, []byte("<?xml")) {
+        t.Errorf("rss feed should start with <?xml. %s", rss)
+    }
 }
