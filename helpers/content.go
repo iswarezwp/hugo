@@ -390,16 +390,26 @@ func TruncateWordsToWholeSentence(words []string, max int) (string, bool) {
     }
 
     for counter, word := range words[max:] {
-        if strings.HasSuffix(word, ".") || strings.HasSuffix(word, "。") ||
-            strings.HasSuffix(word, "?") || strings.HasSuffix(word, "？") ||
-            strings.HasSuffix(word, ".\"") || strings.HasSuffix(word, "”") ||
-            strings.HasSuffix(word, "!") || strings.HasSuffix(word, "！") {
+        if strings.HasSuffix(word, ".") ||
+            strings.HasSuffix(word, "?") ||
+            strings.HasSuffix(word, ".\"") ||
+            strings.HasSuffix(word, "!") {
             upper := max + counter + 1
             return strings.Join(words[:upper], " "), (upper < len(words))
         }
     }
 
     return strings.Join(words[:max], " "), true
+}
+
+// Truncate Chinese
+func TruncateChinese(words []string, max int) (string, bool) {
+    // Chinese blog
+    if len(words) > 0 {
+        return words[0], len(words) > 1
+    } else {
+        return "", true
+    }
 }
 
 // GetAsciidocContent calls asciidoctor or asciidoc as an external helper

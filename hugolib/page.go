@@ -217,10 +217,15 @@ func (p *Page) setSummary() {
     } else {
         // If hugo defines split:
         // render, strip html, then split
-        summary, truncated := helpers.TruncateWordsToWholeSentence(p.PlainWords(), helpers.SummaryLength)
-        p.Summary = template.HTML(summary)
-        p.Truncated = truncated
-
+        if viper.GetString("languageCode") == "cn-zh" {
+            summary, truncated := helpers.TruncateChinese(p.PlainWords(), helpers.SummaryLength)
+            p.Summary = template.HTML(summary)
+            p.Truncated = truncated
+        } else {
+            summary, truncated := helpers.TruncateWordsToWholeSentence(p.PlainWords(), helpers.SummaryLength)
+            p.Summary = template.HTML(summary)
+            p.Truncated = truncated
+        }
     }
 }
 
